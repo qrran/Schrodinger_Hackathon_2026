@@ -2,9 +2,13 @@
 Chemistry utilities for molecular similarity search using RDKit and ChEMBL.
 """
 
+import base64
+from io import BytesIO
 from rdkit import Chem
 from rdkit.DataStructs import TanimotoSimilarity
 from rdkit.Chem import rdFingerprintGenerator as rdFpGen
+from rdkit.Chem import rdMolDescriptors
+from rdkit.Chem import Draw
 from chembl_webresource_client.new_client import new_client
 from typing import List, Dict, Optional
 
@@ -44,6 +48,62 @@ def calculate_fingerprint(mol: Chem.Mol):
         Morgan fingerprint
     """
     return MORGAN_GENERATOR.GetFingerprint(mol)
+
+
+def calculate_molecular_descriptors(mol: Chem.Mol) -> Dict[str, float]:
+    """
+    Calculate molecular descriptors for a molecule using RDKit.
+    
+    Args:
+        mol: RDKit Mol object
+        
+    Returns:
+        Dictionary of descriptor names and values
+    """
+    try:
+        properties = rdMolDescriptors.Properties()
+        names = properties.GetPropertyNames()
+        values = properties.ComputeProperties(mol)
+        
+        # Create dictionary of descriptors
+        descriptors = {}
+        for name, value in zip(names, values):
+            descriptors[name] = round(value, 3) if isinstance(value, float) else value
+        
+        return descriptors
+    except Exception as e:
+        return {"error": f"Failed to calculate descriptors: {str(e)}"}
+
+
+def generate_molecule_image(mol: Chem.Mol, size=(300, 300)) -> str:
+    """
+    Generate a 2D structure image of a molecule as a base64-encoded PNG.
+    
+    Args:
+        mol: RDKit Mol object
+        size: Tuple of (width, height) for the image
+        
+    Returns:
+        Base64-encoded data URL string for direct HTML embedding
+    """
+    try:
+        # Generate 2D coordinates if not present
+        if mol.GetNumConformers() == 0:
+            from rdkit.Chem import AllChem
+            AllChem.Compute2DCoords(mol)
+        
+        # Generate image
+        img = Draw.MolToImage(mol, size=size)
+        
+        # Convert to base64
+        buffered = BytesIO()
+        img.save(buffered, format="PNG")
+        img_str = base64.b64encode(buffered.getvalue()).decode()
+        
+        # Return as data URL
+        return f"data:image/png;base64,{img_str}"
+    except Exception as e:
+        return None
 
 
 def search_similar_compounds_chembl(query_smiles: str, similarity_threshold: int = 70, limit: int = 20) -> List[Dict]:
@@ -88,11 +148,19 @@ def search_similar_compounds_chembl(query_smiles: str, similarity_threshold: int
                         compound_fp = calculate_fingerprint(compound_mol)
                         similarity_score = TanimotoSimilarity(query_fp, compound_fp)
                         
+                        # Calculate molecular descriptors
+                        descriptors = calculate_molecular_descriptors(compound_mol)
+                        
+                        # Generate 2D structure image
+                        image = generate_molecule_image(compound_mol)
+                        
                         compounds.append({
                             'chembl_id': compound.get('molecule_chembl_id', 'N/A'),
                             'name': compound.get('pref_name', 'Unknown'),
                             'smiles': compound_smiles,
-                            'similarity': round(similarity_score, 3)
+                            'similarity': round(similarity_score, 3),
+                            'descriptors': descriptors,
+                            'image': image
                         })
             except Exception as e:
                 # Skip compounds that cause errors
