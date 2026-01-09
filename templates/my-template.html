@@ -21,50 +21,50 @@ Chemical Similarity Search - Stack the Future 2026
           <label for="smilesInput" class="form-label fw-bold">
             Enter SMILES String:
           </label>
-          <input 
-            type="text" 
-            class="form-control form-control-lg" 
-            id="smilesInput" 
-            placeholder="e.g., CC(=O)Oc1ccccc1C(=O)O (aspirin)"
-            required
-          >
+          <input type="text" class="form-control form-control-lg" id="smilesInput"
+            placeholder="e.g., CC(=O)Oc1ccccc1C(=O)O (aspirin)" required>
           <div class="form-text">
             Enter a valid SMILES string representing the chemical structure you want to search for.
           </div>
-        </div>
 
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label for="limitInput" class="form-label">Maximum Results:</label>
-            <input 
-              type="number" 
-              class="form-control" 
-              id="limitInput" 
-              value="20" 
-              min="1" 
-              max="100"
-            >
+          <div class="mt-4">
+            <p class="mb-2 text-muted"><strong>Example SMILES:</strong></p>
+            <div class="d-flex flex-wrap gap-2">
+              <button class="btn btn-sm btn-outline-secondary example-btn" data-smiles="CC(=O)Oc1ccccc1C(=O)O">
+                Aspirin
+              </button>
+              <button class="btn btn-sm btn-outline-secondary example-btn" data-smiles="CN1C=NC2=C1C(=O)N(C(=O)N2C)C">
+                Caffeine
+              </button>
+              <button class="btn btn-sm btn-outline-secondary example-btn" data-smiles="CC(C)Cc1ccc(cc1)C(C)C(=O)O">
+                Ibuprofen
+              </button>
+              <button class="btn btn-sm btn-outline-secondary example-btn"
+                data-smiles="CN(C)CCc1c[nH]c2ccc(cc12)CS(=O)(=O)N">
+                Sumatriptan
+              </button>
+            </div>
           </div>
-          <div class="col-md-6">
-            <label for="thresholdInput" class="form-label">Similarity Threshold (%):</label>
-            <input 
-              type="number" 
-              class="form-control" 
-              id="thresholdInput" 
-              value="70" 
-              min="50" 
-              max="100"
-            >
-          </div>
-        </div>
 
-        <button type="submit" class="btn btn-primary btn-lg w-100">
-          <i class="bi bi-search"></i> Search Similar Compounds
-        </button>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="limitInput" class="form-label">Maximum Results:</label>
+              <input type="number" class="form-control" id="limitInput" value="20" min="1" max="100">
+            </div>
+            <div class="col-md-6">
+              <label for="thresholdInput" class="form-label">Similarity Threshold (%):</label>
+              <input type="number" class="form-control" id="thresholdInput" value="70" min="50" max="100">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg w-100">
+            <i class="bi bi-search"></i> Search Similar Compounds
+          </button>
       </form>
 
       <!-- Example SMILES -->
-      <div class="mt-4">
+      <!-- <div class="mt-4">
         <p class="mb-2 text-muted"><strong>Example SMILES:</strong></p>
         <div class="d-flex flex-wrap gap-2">
           <button class="btn btn-sm btn-outline-secondary example-btn" data-smiles="CC(=O)Oc1ccccc1C(=O)O">
@@ -80,7 +80,7 @@ Chemical Similarity Search - Stack the Future 2026
             Sumatriptan
           </button>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 
@@ -101,12 +101,12 @@ Chemical Similarity Search - Stack the Future 2026
   <!-- Results Section -->
   <div id="resultsSection" style="display: none;">
     <div class="card shadow-sm">
-      <div class="card-header bg-success text-white">
+      <div class="card-header bg-success text-black">
         <h5 class="mb-0">
-          <i class="bi bi-check-circle"></i> 
+          <i class="bi bi-check-circle"></i>
           Search Results: <span id="resultCount">0</span> compounds found
         </h5>
-        <small>Query: <code id="querySmiles" class="text-white"></code></small>
+        <small>Query: <code id="querySmiles" class="text-black"></code></small>
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
@@ -138,71 +138,71 @@ Chemical Similarity Search - Stack the Future 2026
   .example-btn {
     font-size: 0.85rem;
   }
-  
+
   .example-btn:hover {
     background-color: #0d6efd;
     color: white;
     border-color: #0d6efd;
   }
-  
+
   #resultsTable th {
     position: sticky;
     top: 0;
     background-color: #f8f9fa;
     z-index: 10;
   }
-  
+
   #resultsTable tbody tr:hover {
     background-color: #f0f8ff;
   }
-  
+
   .similarity-badge {
     font-size: 1rem;
     font-weight: bold;
   }
-  
+
   code {
     background-color: #f8f9fa;
     padding: 2px 6px;
     border-radius: 3px;
     font-size: 0.9rem;
   }
-  
+
   .molecule-image {
     max-width: 200px;
     height: auto;
     border: 1px solid #dee2e6;
     border-radius: 4px;
   }
-  
+
   .descriptor-row {
     background-color: #f8f9fa;
     border-top: 2px solid #dee2e6;
   }
-  
+
   .descriptor-content {
     padding: 15px;
   }
-  
+
   .descriptor-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 10px;
   }
-  
+
   .descriptor-item {
     background: white;
     padding: 8px 12px;
     border-radius: 4px;
     border: 1px solid #dee2e6;
   }
-  
+
   .descriptor-name {
     font-weight: 600;
     color: #495057;
     font-size: 0.85rem;
   }
-  
+
   .descriptor-value {
     color: #0d6efd;
     font-size: 0.9rem;
@@ -210,7 +210,6 @@ Chemical Similarity Search - Stack the Future 2026
   }
 
   body {
-    text-align: center;
     background-color: rgb(255, 251, 172);
     color: rgb(1, 0, 27);
   }
@@ -223,8 +222,12 @@ Chemical Similarity Search - Stack the Future 2026
     font-style: italic;
     text-align: center;
   }
-  
+
   .mt-4 {
+    padding-bottom: 50px;
+  }
+
+  .mb-0 {
     text-align: center;
   }
 
@@ -235,30 +238,30 @@ Chemical Similarity Search - Stack the Future 2026
 <script>
   // Example SMILES buttons
   document.querySelectorAll('.example-btn').forEach(btn => {
-    btn.addEventListener('click', function(e) {
+    btn.addEventListener('click', function (e) {
       e.preventDefault();
       document.getElementById('smilesInput').value = this.dataset.smiles;
     });
   });
 
   // Form submission
-  document.getElementById('searchForm').addEventListener('submit', async function(e) {
+  document.getElementById('searchForm').addEventListener('submit', async function (e) {
     e.preventDefault();
-    
+
     const smiles = document.getElementById('smilesInput').value.trim();
     const limit = parseInt(document.getElementById('limitInput').value);
     const threshold = parseInt(document.getElementById('thresholdInput').value);
-    
+
     if (!smiles) {
       showError('Please enter a SMILES string');
       return;
     }
-    
+
     // Show loading, hide results and errors
     document.getElementById('loadingSpinner').style.display = 'block';
     document.getElementById('resultsSection').style.display = 'none';
     document.getElementById('errorAlert').style.display = 'none';
-    
+
     try {
       const response = await fetch('/api/search-similar', {
         method: 'POST',
@@ -271,15 +274,15 @@ Chemical Similarity Search - Stack the Future 2026
           threshold: threshold
         })
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.error || 'Search failed');
       }
-      
+
       displayResults(data);
-      
+
     } catch (error) {
       showError(error.message);
     } finally {
@@ -290,22 +293,22 @@ Chemical Similarity Search - Stack the Future 2026
   function displayResults(data) {
     const resultsBody = document.getElementById('resultsBody');
     resultsBody.innerHTML = '';
-    
+
     document.getElementById('querySmiles').textContent = data.query_smiles;
     document.getElementById('resultCount').textContent = data.count;
-    
+
     if (data.results.length === 0) {
       resultsBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">No similar compounds found. Try lowering the similarity threshold.</td></tr>';
     } else {
       data.results.forEach((compound, index) => {
         const rowId = `compound-${index}`;
         const descriptorId = `descriptors-${index}`;
-        
+
         // Determine badge color based on similarity
         let badgeClass = 'bg-success';
         if (compound.similarity < 0.7) badgeClass = 'bg-warning';
         if (compound.similarity < 0.5) badgeClass = 'bg-secondary';
-        
+
         // Main compound row
         const row = document.createElement('tr');
         row.id = rowId;
@@ -336,9 +339,9 @@ Chemical Similarity Search - Stack the Future 2026
             </button>
           </td>
         `;
-        
+
         resultsBody.appendChild(row);
-        
+
         // Descriptor row (hidden by default)
         const descriptorRow = document.createElement('tr');
         descriptorRow.className = 'descriptor-row';
@@ -354,19 +357,19 @@ Chemical Similarity Search - Stack the Future 2026
             </div>
           </td>
         `;
-        
+
         resultsBody.appendChild(descriptorRow);
       });
     }
-    
+
     document.getElementById('resultsSection').style.display = 'block';
   }
-  
+
   function formatDescriptors(descriptors) {
     if (!descriptors || descriptors.error) {
       return '<div class="text-muted">Descriptors not available</div>';
     }
-    
+
     let html = '';
     for (const [name, value] of Object.entries(descriptors)) {
       html += `
@@ -378,11 +381,11 @@ Chemical Similarity Search - Stack the Future 2026
     }
     return html;
   }
-  
+
   function toggleDescriptors(descriptorId, button) {
     const descriptorRow = document.getElementById(descriptorId);
     const icon = button.querySelector('i');
-    
+
     if (descriptorRow.style.display === 'none') {
       descriptorRow.style.display = 'table-row';
       icon.className = 'bi bi-chevron-up';
