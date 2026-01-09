@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}
-Chemical Similarity Search - Stack the Future 2026
-{% endblock %}
+{% block title %}Chemical Similarity Search - Stack the Future 2026{% endblock %}
 
 {% block content %}
 <div class="my-5">
@@ -80,18 +78,37 @@ Chemical Similarity Search - Stack the Future 2026
           <button class="btn btn-sm btn-outline-secondary example-btn" data-smiles="CN(C)CCc1c[nH]c2ccc(cc12)CS(=O)(=O)N">
             Sumatriptan
           </button>
+        </form>
+
+        <!-- Example SMILES -->
+        <div class="mt-4">
+          <p class="mb-2 text-muted">
+            <strong>Example SMILES:</strong>
+          </p>
+          <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-sm btn-outline-secondary example-btn"
+                    data-smiles="CC(=O)Oc1ccccc1C(=O)O">Aspirin</button>
+            <button class="btn btn-sm btn-outline-secondary example-btn"
+                    data-smiles="CN1C=NC2=C1C(=O)N(C(=O)N2C)C">Caffeine</button>
+            <button class="btn btn-sm btn-outline-secondary example-btn"
+                    data-smiles="CC(C)Cc1ccc(cc1)C(C)C(=O)O">Ibuprofen</button>
+            <button class="btn btn-sm btn-outline-secondary example-btn"
+                    data-smiles="CN(C)CCc1c[nH]c2ccc(cc12)CS(=O)(=O)N">Sumatriptan</button>
+          </div>
         </div>
       </div> -->
     </div>
-  </div>
 
-  <!-- Loading Spinner -->
-  <div id="loadingSpinner" class="text-center my-5" style="display: none;">
-    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-      <span class="visually-hidden">Loading...</span>
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="text-center my-5" style="display: none;">
+      <div class="spinner-border text-primary"
+           role="status"
+           style="width: 3rem;
+                  height: 3rem">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-muted">Searching ChEMBL database...</p>
     </div>
-    <p class="mt-3 text-muted">Searching ChEMBL database...</p>
-  </div>
 
   <!-- Error Alert -->
   <div id="errorAlert" class="alert alert-danger" role="alert" style="display: none;">
@@ -135,7 +152,6 @@ Chemical Similarity Search - Stack the Future 2026
       </div>
     </div>
   </div>
-</div>
 {% endblock %}
 
 {% block styles %}
@@ -255,7 +271,7 @@ Chemical Similarity Search - Stack the Future 2026
 {% endblock %}
 
 {% block scripts %}
-<script>
+  <script>
   // Example SMILES buttons
   document.querySelectorAll('.example-btn').forEach(btn => {
     btn.addEventListener('click', function (e) {
@@ -269,6 +285,7 @@ Chemical Similarity Search - Stack the Future 2026
     e.preventDefault();
 
     const smiles = document.getElementById('smilesInput').value.trim();
+    const compoundName = (document.getElementById('nameInput') && document.getElementById('nameInput').value.trim()) || '';
     const limit = parseInt(document.getElementById('limitInput').value);
     const threshold = parseInt(document.getElementById('thresholdInput').value);
 
@@ -290,6 +307,7 @@ Chemical Similarity Search - Stack the Future 2026
         },
         body: JSON.stringify({
           smiles: smiles,
+          compound_name: compoundName,
           limit: limit,
           threshold: threshold
         })
@@ -338,9 +356,7 @@ Chemical Similarity Search - Stack the Future 2026
             ${compound.image ? `<img src="${compound.image}" class="molecule-image" alt="Structure">` : 'N/A'}
           </td>
           <td>
-            <a href="https://www.ebi.ac.uk/chembl/compound_report_card/${compound.chembl_id}/" 
-               target="_blank" 
-               class="text-decoration-none">
+            <a href="https://www.ebi.ac.uk/chembl/compound_report_card/${compound.chembl_id}/" target="_blank" class="text-decoration-none">
               ${compound.chembl_id} <i class="bi bi-box-arrow-up-right"></i>
             </a>
           </td>
@@ -352,9 +368,7 @@ Chemical Similarity Search - Stack the Future 2026
             </span>
           </td>
           <td class="text-center">
-            <button class="btn btn-sm btn-outline-primary" 
-                    onclick="toggleDescriptors('${descriptorId}', this)"
-                    type="button">
+            <button class="btn btn-sm btn-outline-primary" onclick="toggleDescriptors('${descriptorId}', this)" type="button">
               <i class="bi bi-chevron-down"></i> Details
             </button>
           </td>
