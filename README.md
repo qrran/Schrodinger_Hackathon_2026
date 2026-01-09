@@ -3,10 +3,6 @@
 
 A Flask application that accepts SMILES strings for chemicals/drugs and returns chemically similar compounds using RDKit fingerprints and the ChEMBL database.
 
-## Why is it important to find SimilarSMILES?
-
-It is important for chemists to generate Similar SMILES compounds because it enables them to improve a drug. In their drug discovery, chemists may want to improve a molecule, such as Ibuprofen. In order to do so, chemists will need to search for compounds similar to Ibuprofen. As a result, chemists can 
-
 ## 🚀 Quick Start
 
 ### 1. Activate Virtual Environment & Install Dependencies
