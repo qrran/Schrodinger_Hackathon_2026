@@ -5,7 +5,7 @@
 {% block content %}
   <div class="my-5">
     <h1 class="text-center mb-4">
-      <i class="bi bi-molecule"></i> Chemical Similarity Search
+      <i class="bi bi-molecule"></i> Similiar SMILES :D
     </h1>
     <p class="text-center text-muted mb-5">
       Find chemically similar compounds using RDKit fingerprints and the ChEMBL database
@@ -16,16 +16,39 @@
       <div class="card-body">
         <form id="searchForm">
           <div class="mb-3">
-            <label for="smilesInput" class="form-label fw-bold">Enter SMILES String:</label>
-            <input type="text"
-                   class="form-control form-control-lg"
-                   id="smilesInput"
-                   placeholder="e.g., CC(=O)Oc1ccccc1C(=O)O (aspirin)">
-            <div class="form-text">Enter a valid SMILES string representing the chemical structure you want to search for.</div>
+
+              <label for="smilesInput" class="form-label fw-bold">Enter SMILES String:</label>
+              <input type="text"
+                    class="form-control form-control-lg"
+                    id="smilesInput"
+                    placeholder="e.g., CC(=O)Oc1ccccc1C(=O)O (aspirin)">
+              <div class="form-text">Enter a valid SMILES string representing the chemical structure you want to search for.</div>
+         <!-- Example SMILES -->
+          <div class="mt-4">
+            <div class="d-flex align-items-center flex-wrap gap-2">
+              <p class="mb-0 me-2">
+                <strong>Example SMILES:</strong>
+              </p>
+
+              <button class="btn btn-sm btn-outline-secondary example-btn"
+                      data-smiles="CC(=O)Oc1ccccc1C(=O)O">Aspirin</button>
+
+              <button class="btn btn-sm btn-outline-secondary example-btn"
+                      data-smiles="CN1C=NC2=C1C(=O)N(C(=O)N2C)C">Caffeine</button>
+
+              <button class="btn btn-sm btn-outline-secondary example-btn"
+                      data-smiles="CC(C)Cc1ccc(cc1)C(C)C(=O)O">Ibuprofen</button>
+
+              <button class="btn btn-sm btn-outline-secondary example-btn"
+                      data-smiles="CN(C)CCc1c[nH]c2ccc(cc12)CS(=O)(=O)N">Sumatriptan</button>
+            </div>
+          </div>
+          
           </div>
 
+
           <div class="mb-3">
-            <label for="nameInput" class="form-label fw-bold">Or enter Compound Name:</label>
+            <label for="nameInput" class="form-label fw-bold">or Enter Compound Name:</label>
             <input type="text"
                    class="form-control"
                    id="nameInput"
@@ -62,7 +85,7 @@
         </form>
 
         <!-- Example SMILES --> 
-        <div class="mt-4">
+        <!-- <div class="mt-4">
           <p class="mb-2 text-muted">
             <strong>Example SMILES:</strong>
           </p>
@@ -76,7 +99,7 @@
             <button class="btn btn-sm btn-outline-secondary example-btn"
                     data-smiles="CN(C)CCc1c[nH]c2ccc(cc12)CS(=O)(=O)N">Sumatriptan</button>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
 
@@ -108,7 +131,11 @@
             <i class="bi bi-check-circle"></i>
             Search Results: <span id="resultCount">0</span> compounds found
           </h5>
-          <small>Query: <code id="querySmiles" class="text-white"></code></small>
+          <div class="d-flex justify-content-center align-items-center">
+            <small class="text-white">
+              Query: <code id="querySmiles"></code>
+            </small>
+          </div>
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">
@@ -137,6 +164,34 @@
 
 {% block styles %}
   <style>
+
+  body { 
+    background: linear-gradient(180deg, #fafafa 0%, #cde4f8 100%);
+  }
+
+  .card-header {
+    padding: 30px 0px 30px 0px;
+  }
+
+  .mb-2 {
+    margin-top: -20px;
+  }
+
+  .mt-4 {
+    padding-bottom: 20px;
+  }
+
+  .mb-0 {
+    text-align: center;
+    padding-bottom: 20px;
+  }
+
+  .my-5 h1 {
+    color: #0d6efd;
+    font-weight: bold;
+    font-size: 5vw;
+  }
+
   .example-btn {
     font-size: 0.85rem;
   }
