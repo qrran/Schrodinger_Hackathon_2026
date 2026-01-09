@@ -6,8 +6,5 @@
   },
   "[html][jinja][jinja-html]": {
     "editor.defaultFormatter": "monosans.djlint"
-  },
-  "[html]": {
-    "editor.defaultFormatter": "vscode.html-language-features"
   }
 }
