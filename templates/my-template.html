@@ -110,24 +110,16 @@ Chemical Similarity Search - Stack the Future 2026
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
-          <table class="table table-hover mb-0" id="resultsTable">
+          <table class="table mb-0" id="resultsTable">
             <thead class="table-light">
               <tr>
-                <th style="cursor: pointer;" onclick="sortTable(0)">
-                  Rank <i class="bi bi-arrow-down-up"></i>
-                </th>
-                <th style="cursor: pointer;" onclick="sortTable(1)">
-                  ChEMBL ID <i class="bi bi-arrow-down-up"></i>
-                </th>
-                <th style="cursor: pointer;" onclick="sortTable(2)">
-                  Name <i class="bi bi-arrow-down-up"></i>
-                </th>
-                <th style="cursor: pointer;" onclick="sortTable(3)">
-                  SMILES <i class="bi bi-arrow-down-up"></i>
-                </th>
-                <th style="cursor: pointer;" onclick="sortTable(4)">
-                  Similarity Score <i class="bi bi-arrow-down-up"></i>
-                </th>
+                <th>Rank</th>
+                <th>Structure</th>
+                <th>ChEMBL ID</th>
+                <th>Name</th>
+                <th>SMILES</th>
+                <th>Similarity Score</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="resultsBody">
@@ -174,6 +166,47 @@ Chemical Similarity Search - Stack the Future 2026
     padding: 2px 6px;
     border-radius: 3px;
     font-size: 0.9rem;
+  }
+  
+  .molecule-image {
+    max-width: 200px;
+    height: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+  }
+  
+  .descriptor-row {
+    background-color: #f8f9fa;
+    border-top: 2px solid #dee2e6;
+  }
+  
+  .descriptor-content {
+    padding: 15px;
+  }
+  
+  .descriptor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 10px;
+  }
+  
+  .descriptor-item {
+    background: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+  }
+  
+  .descriptor-name {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.85rem;
+  }
+  
+  .descriptor-value {
+    color: #0d6efd;
+    font-size: 0.9rem;
+    font-family: monospace;
   }
 </style>
 {% endblock %}
@@ -242,18 +275,25 @@ Chemical Similarity Search - Stack the Future 2026
     document.getElementById('resultCount').textContent = data.count;
     
     if (data.results.length === 0) {
-      resultsBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">No similar compounds found. Try lowering the similarity threshold.</td></tr>';
+      resultsBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">No similar compounds found. Try lowering the similarity threshold.</td></tr>';
     } else {
       data.results.forEach((compound, index) => {
-        const row = document.createElement('tr');
+        const rowId = `compound-${index}`;
+        const descriptorId = `descriptors-${index}`;
         
         // Determine badge color based on similarity
         let badgeClass = 'bg-success';
         if (compound.similarity < 0.7) badgeClass = 'bg-warning';
         if (compound.similarity < 0.5) badgeClass = 'bg-secondary';
         
+        // Main compound row
+        const row = document.createElement('tr');
+        row.id = rowId;
         row.innerHTML = `
           <td class="text-center">${index + 1}</td>
+          <td class="text-center">
+            ${compound.image ? `<img src="${compound.image}" class="molecule-image" alt="Structure">` : 'N/A'}
+          </td>
           <td>
             <a href="https://www.ebi.ac.uk/chembl/compound_report_card/${compound.chembl_id}/" 
                target="_blank" 
@@ -262,59 +302,82 @@ Chemical Similarity Search - Stack the Future 2026
             </a>
           </td>
           <td>${compound.name || 'Unknown'}</td>
-          <td><code>${compound.smiles}</code></td>
+          <td><code style="font-size: 0.75rem;">${compound.smiles}</code></td>
           <td>
             <span class="badge ${badgeClass} similarity-badge">
               ${compound.similarity.toFixed(3)}
             </span>
           </td>
+          <td class="text-center">
+            <button class="btn btn-sm btn-outline-primary" 
+                    onclick="toggleDescriptors('${descriptorId}', this)"
+                    type="button">
+              <i class="bi bi-chevron-down"></i> Details
+            </button>
+          </td>
         `;
         
         resultsBody.appendChild(row);
+        
+        // Descriptor row (hidden by default)
+        const descriptorRow = document.createElement('tr');
+        descriptorRow.className = 'descriptor-row';
+        descriptorRow.id = descriptorId;
+        descriptorRow.style.display = 'none';
+        descriptorRow.innerHTML = `
+          <td colspan="7">
+            <div class="descriptor-content">
+              <h6 class="mb-3"><i class="bi bi-clipboard-data"></i> Molecular Descriptors</h6>
+              <div class="descriptor-grid">
+                ${formatDescriptors(compound.descriptors)}
+              </div>
+            </div>
+          </td>
+        `;
+        
+        resultsBody.appendChild(descriptorRow);
       });
     }
     
     document.getElementById('resultsSection').style.display = 'block';
+  }
+  
+  function formatDescriptors(descriptors) {
+    if (!descriptors || descriptors.error) {
+      return '<div class="text-muted">Descriptors not available</div>';
+    }
+    
+    let html = '';
+    for (const [name, value] of Object.entries(descriptors)) {
+      html += `
+        <div class="descriptor-item">
+          <div class="descriptor-name">${name}</div>
+          <div class="descriptor-value">${value}</div>
+        </div>
+      `;
+    }
+    return html;
+  }
+  
+  function toggleDescriptors(descriptorId, button) {
+    const descriptorRow = document.getElementById(descriptorId);
+    const icon = button.querySelector('i');
+    
+    if (descriptorRow.style.display === 'none') {
+      descriptorRow.style.display = 'table-row';
+      icon.className = 'bi bi-chevron-up';
+      button.innerHTML = '<i class="bi bi-chevron-up"></i> Hide';
+    } else {
+      descriptorRow.style.display = 'none';
+      icon.className = 'bi bi-chevron-down';
+      button.innerHTML = '<i class="bi bi-chevron-down"></i> Details';
+    }
   }
 
   function showError(message) {
     document.getElementById('errorMessage').textContent = message;
     document.getElementById('errorAlert').style.display = 'block';
     document.getElementById('resultsSection').style.display = 'none';
-  }
-
-  // Simple table sorting
-  let sortDirection = {};
-  
-  function sortTable(columnIndex) {
-    const table = document.getElementById('resultsTable');
-    const tbody = table.querySelector('tbody');
-    const rows = Array.from(tbody.querySelectorAll('tr'));
-    
-    // Toggle sort direction
-    sortDirection[columnIndex] = !sortDirection[columnIndex];
-    const ascending = sortDirection[columnIndex];
-    
-    rows.sort((a, b) => {
-      let aValue = a.cells[columnIndex].textContent.trim();
-      let bValue = b.cells[columnIndex].textContent.trim();
-      
-      // Try to parse as number
-      const aNum = parseFloat(aValue);
-      const bNum = parseFloat(bValue);
-      
-      if (!isNaN(aNum) && !isNaN(bNum)) {
-        return ascending ? aNum - bNum : bNum - aNum;
-      }
-      
-      // String comparison
-      return ascending ? 
-        aValue.localeCompare(bValue) : 
-        bValue.localeCompare(aValue);
-    });
-    
-    // Re-append sorted rows
-    rows.forEach(row => tbody.appendChild(row));
   }
 </script>
 {% endblock %}

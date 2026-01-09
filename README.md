@@ -21,34 +21,60 @@ flask run
 
 The application will be available at: **http://127.0.0.1:5001**
 
+**Note:** If port 5001 is in use, specify a different port:
+```bash
+FLASK_RUN_PORT=5003 flask run
+```
+Then access at: **http://127.0.0.1:5003**
+
 ## What Was Built
 
 ### Files Created/Modified
 
 1. **`requirements.txt`** - Added `chembl-webresource-client==0.10.8`
-2. **`chemistry.py`** (NEW) - Core chemical similarity logic
+2. **`chemistry.py`** (NEW) - Core chemical similarity logic with:
+   - Morgan fingerprint generation
+   - Molecular descriptor calculation (43 properties)
+   - 2D structure image generation
+   - ChEMBL API integration
 3. **`app.py`** - Added `/api/search-similar` endpoint
-4. **`templates/my-template.html`** - Complete search interface
+4. **`templates/my-template.html`** - Complete search interface with:
+   - Structure image display
+   - Expandable descriptor panels
+   - Interactive results table
 
 ### Key Features
 
- **Morgan Fingerprint Similarity** (radius=2, 1024 bits)
+**Morgan Fingerprint Similarity** (radius=2, 1024 bits)
 - Uses RDKit's Morgan fingerprint generator
 - Tanimoto similarity coefficient for comparison
 
- **ChEMBL Database Integration**
+**ChEMBL Database Integration**
 - Searches millions of compounds
 - Configurable similarity threshold (default 70%)
 - Returns ChEMBL IDs, names, and SMILES
 
- **Beautiful Web Interface**
+**2D Structure Images**
+- Visual representation of each compound
+- Automatically generated PNG images (300x300 pixels)
+- Base64-encoded for direct HTML embedding
+- No external files needed
+
+**Molecular Descriptors**
+- 43 calculated properties for each compound
+- Includes MW, LogP, TPSA, H-bond donors/acceptors, rotatable bonds, etc.
+- Expandable details panel in the UI
+- Uses RDKit's `rdMolDescriptors.Properties()`
+
+**Beautiful Web Interface**
 - Input form with validation
 - Example SMILES buttons (Aspirin, Caffeine, Ibuprofen, Sumatriptan)
-- Sortable results table
+- Results table with structure images
 - Color-coded similarity scores
+- Expandable descriptor panels for detailed molecular properties
 - Direct links to ChEMBL compound pages
 
- **Drug Similarity Support**
+**Drug Similarity Support**
 - Searches based on active ingredient structure
 - Works for any valid SMILES string
 
@@ -56,11 +82,15 @@ The application will be available at: **http://127.0.0.1:5001**
 
 ### Via Web Interface
 
-1. Open http://127.0.0.1:5001 in your browser
+1. Open http://127.0.0.1:5001 in your browser (or http://127.0.0.1:5003 if using alternate port)
 2. Click "Aspirin" example button (or enter your own SMILES)
 3. Adjust threshold and limit if desired
 4. Click "Search Similar Compounds"
-5. View results with similarity scores
+5. View results with:
+   - 2D structure images for each compound
+   - Similarity scores (color-coded)
+   - ChEMBL IDs with direct links
+6. Click "Details" button on any compound to see all 43 molecular descriptors
 
 ### Via API
 
@@ -112,13 +142,61 @@ compound_fp = MORGAN_GENERATOR.GetFingerprint(compound_mol)
 similarity_score = TanimotoSimilarity(query_fp, compound_fp)
 ```
 
-### 5. Return Sorted Results
+### 5. Calculate Molecular Descriptors & Generate Images
+
+For each compound:
+```python
+# Calculate 43 molecular descriptors
+properties = rdMolDescriptors.Properties()
+names = properties.GetPropertyNames()
+values = properties.ComputeProperties(mol)
+
+# Generate 2D structure image
+img = Draw.MolToImage(mol, size=(300, 300))
+img_str = base64.b64encode(buffered.getvalue()).decode()
+```
+
+### 6. Return Sorted Results
 
 Results sorted by similarity (highest first) with:
+- 2D structure image
 - ChEMBL ID
 - Compound name
 - SMILES structure
 - Tanimoto score (0.000-1.000)
+- 43 molecular descriptors (expandable)
+
+## Molecular Descriptors
+
+Each search result includes 43 calculated molecular properties:
+
+**Sample Properties:**
+- `exactmw` - Exact molecular weight
+- `amw` - Average molecular weight
+- `lipinskiHBA` - Lipinski H-bond acceptors
+- `lipinskiHBD` - Lipinski H-bond donors
+- `NumRotatableBonds` - Number of rotatable bonds
+- `NumHBD` - Number of hydrogen bond donors
+- `NumHBA` - Number of hydrogen bond acceptors
+- `NumHeavyAtoms` - Number of heavy atoms
+- `NumAromaticRings` - Number of aromatic rings
+- And 34 more...
+
+**Example for Aspirin:**
+```
+exactmw             : 180.042
+amw                 : 180.159
+lipinskiHBA         : 4.0
+lipinskiHBD         : 1.0
+NumRotatableBonds   : 3.0
+NumHeavyAtoms       : 13.0
+NumAromaticRings    : 1.0
+```
+
+**How to View:**
+1. Search for a compound
+2. Click the "Details" button on any result
+3. View all 43 descriptors in an organized grid
 
 ##  Test Results
 
@@ -185,7 +263,19 @@ For drugs (which may contain multiple chemical components), the system:
       "chembl_id": "CHEMBL25",
       "name": "ASPIRIN",
       "smiles": "CC(=O)Oc1ccccc1C(=O)O",
-      "similarity": 1.0
+      "similarity": 1.0,
+      "image": "data:image/png;base64,iVBORw0KGgo...",
+      "descriptors": {
+        "exactmw": 180.042,
+        "amw": 180.159,
+        "lipinskiHBA": 4.0,
+        "lipinskiHBD": 1.0,
+        "NumRotatableBonds": 3.0,
+        "NumHBD": 1.0,
+        "NumHBA": 2.0,
+        "NumHeavyAtoms": 13.0
+        // ... 35 more properties
+      }
     }
   ]
 }
